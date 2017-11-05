@@ -5,7 +5,7 @@ from services.model_server.models import Dataset
 from services import db
 
 
-data_blueprint = Blueprint('data', __name__)
+data_blueprint = Blueprint('data', __name__, template_folder='./templates')
 
 
 @data_blueprint.route('/ping', methods=['GET'])
@@ -32,18 +32,21 @@ def get_datasets():
 
 @data_blueprint.route('/dataset', methods=['POST'])
 def add_dataset():
+    # SOMETHING WITH .form
     post_data = request.get_json()
     fail_response_object = {
         'status': 'fail',
         'message': 'Invalid payload'
     }
     if not post_data:
+        fail_response_object['extra'] = 'No post data'
         return jsonify(fail_response_object), 400
     try:
         dataset_name = post_data['name']
         dataset_url = post_data['url']
         dataset_task = post_data['task']
     except:
+        fail_response_object['extra'] = 'One of the keywords not correct'
         return jsonify(fail_response_object), 400
     try:
         dataset = db.session.query(Dataset).filter((Dataset.dataset_name == dataset_name) | (Dataset.url == dataset_url)).first()
@@ -66,4 +69,8 @@ def add_dataset():
         db.session.rollback()
         return jsonify(fail_response_object), 400
 
-# @data_blueprint.route('/data', methods=['GET'])
+
+@data_blueprint.route('/', methods=['GET'])
+def index():
+    datasets = Dataset.query.all()
+    return render_template('index.html', datasets=datasets)

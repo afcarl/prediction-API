@@ -95,3 +95,15 @@ class TestDataset(BaseTestCase):
             raise AssertionError('Data not found')
         else:
             self.assertEqual(len(data), 2)
+
+    def test_add_dataset_form(self):
+        """Test that the POST request works and is added"""
+        with self.client:
+            response = self.client.post(
+                '/dataset',
+                data=json.dumps({'name': 'Iris6',
+                                 'url': 'iris6.com',
+                                 'task': 'Classification'}),
+                content_type='application/json'
+            )
+            self.assertResponse(response, status_code=201, status='success', message='added')
