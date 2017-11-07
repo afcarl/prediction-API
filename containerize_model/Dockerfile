@@ -16,6 +16,10 @@ ADD $model_dir/model_dir/requirements.txt /usr/src/app/requirements.txt
 # Install requirements
 RUN pip install -r requirements.txt
 
+ADD ./app.py /usr/src/app/app.py
+ADD ./base_model.py /usr/src/app/base_model.py
+ADD ./manage.py /usr/src/app/manage.py
+
 # Add the project to the docker container
 # ADD D:/DoingDataScience/predictionAPI /usr/src/app
 ADD $model_dir /usr/src/app

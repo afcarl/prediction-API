@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+
+  model-predict:
+    container_name: model-predict
+    build:
+      context: .
+      args:
+        - model_dir=models/iris
+    ports:
+      - 5000:5000
+    # expose:
+    #  - "5001"
+    # command: gunicorn -b 0.0.0.0:5000 manage:app

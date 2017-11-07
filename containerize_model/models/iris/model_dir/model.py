@@ -1,7 +1,8 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import load_iris
 import numpy as np
-import json
+import pickle
+import os
 
 from base_model import BaseModel
 
@@ -12,14 +13,13 @@ class Model(BaseModel):
         self.model = None
 
     def predict(self, data):
-        data = json.loads(data)
         if isinstance(data['Sepal length'], list):
             data = np.array([data[c] for c in self.columns]).T
         else:
             data = np.array([[data[c] for c in self.columns]])
         prediction = self.model.predict(data)
-        return_json = {'prediction': [self.targets[p] for p in prediction]}
-        return json.loads(return_json)
+        return_dict = {'prediction': [self.targets[p] for p in prediction]}
+        return return_dict
 
     def fit(self):
         iris_data = load_iris()
@@ -29,27 +29,12 @@ class Model(BaseModel):
         self.model.fit(X, y)
 
     def save(self):
-        pass
+        with open('model.pkl', 'wb') as model_pkl:
+            model_pkl.write(pickle.dumps(self.model))
 
     def load(self):
-        pass
-
-
-iris = Iris()
-print(iris.columns)
-iris.fit()
-print(iris.y)
-
-single_predict = json.dumps({'Sepal length': 2.,
-                             'Sepal width' : 3.,
-                             'Petal length': 4.,
-                             'Petal width': 5.})
-
-iris.predict(single_predict)
-
-plural_predict = json.dumps({'Sepal length': [2., 3.],
-                             'Sepal width' : [3., 4.],
-                             'Petal length': [4., 3.],
-                             'Petal width':  [5., 3.]})
-
-iris.predict(plural_predict)
+        if os.path.exists('model.pkl'):
+            with open('model.pkl', 'rb') as model_pkl:
+                self.model = pickle.loads(model_pkl.read())
+        else:
+            self.fit()
