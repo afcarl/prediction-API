@@ -17,6 +17,8 @@ services:
   postgres-db:
     container_name: postgres-db
     build: ./services/db
+    #volumes:
+    #  - ./postgres_data:/var/lib/postgresql/data
     ports:
       - 5435:5432
     environment:
