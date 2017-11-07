@@ -1,0 +1,5 @@
+flask==0.12.2
+flask-script==2.0.6
+psycopg2==2.7.3
+flask-testing==0.6.2
+gunicorn==19.7.1
