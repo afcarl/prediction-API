@@ -1,9 +1,13 @@
 from flask import Blueprint, jsonify, request, render_template
-from sqlalchemy import exc
+from flask import current_app as app
 
-from services.model_server.models import Dataset
+import requests
+
+from services.model_server.models import Model
 from services import db
+from services.api_utils import verify_api_request
 
+import json
 
 data_blueprint = Blueprint('data', __name__, template_folder='./templates')
 
@@ -16,6 +20,41 @@ def ping_pong():
     })
 
 
+@data_blueprint.route('/model/add', methods=['POST'])
+def add_model():
+    keys = ('api_endpoint', 'model_name')
+    post_data, status_code = verify_api_request(request, keys)
+    if status_code != 201:
+        return post_data, status_code
+    model = Model(model_name=post_data['model_name'], api_endpoint=post_data['api_endpoint'])
+    db.session.add(model)
+    db.session.commit()
+    response_object = {
+        'status': 'success',
+        'message': 'Model {} added'.format(post_data['model_name'])
+    }
+    return jsonify(response_object), 201
+
+
+@data_blueprint.route('/predict/<model_name>', methods=['POST'])
+def predict(model_name):
+    available_models = Model.query.all()
+    model_api_endpoints = [model.api_endpoint for model in available_models]
+    post_data, status_code = verify_api_request(request)
+    if status_code != 201:
+        return post_data, status_code
+    #if model_name in model_api_endpoints:
+
+    headers = {'Content-Type': 'application/json'}
+    result = requests.post('http://192.168.99.100:5002/predict'.format(model_name), data=json.dumps(post_data),
+                           headers=headers)
+
+    result = result.json()
+    result['status'] = 'success'
+    result['message'] = 'passed along'
+    return jsonify(result), 201
+
+'''
 @data_blueprint.route('/dataset', methods=['GET'])
 def get_datasets():
     datasets = Dataset.query.all()
@@ -74,3 +113,4 @@ def add_dataset():
 def index():
     datasets = Dataset.query.all()
     return render_template('index.html', datasets=datasets)
+'''

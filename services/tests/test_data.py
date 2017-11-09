@@ -1,13 +1,36 @@
 import json
 
 from services.tests.base import BaseTestCase
-from services.model_server.models import Dataset, Data
+from services.model_server.models import Model
 from services import db, create_app
 
 app = create_app()
 
 
-def add_dataset(dataset_name, url, task_type):
+def add_model(model_name, api_endpoint):
+    model = Model(model_name=model_name, api_endpoint=api_endpoint)
+    db.session.add(model)
+    db.session.commit()
+    return model
+
+
+class TestModel(BaseTestCase):
+    def test_add_model(self):
+        """Check if model is added to database"""
+        with self.client:
+            response = self.client.post(
+                '/model/add',
+                data=json.dumps({'model_name': 'iris',
+                                 'api_endpoint': 'iris'}),
+                content_type='application/json'
+            )
+            self.assertResponse(response, status_code=201, status='success', message='added')
+        model = Model.query.filter(Model.api_endpoint == 'iris').first()
+        if not model:
+            raise AssertionError('No model found in database')
+
+
+'''def add_dataset(dataset_name, url, task_type):
     dataset = Dataset(dataset_name=dataset_name, url=url, task_type=task_type)
     db.session.add(dataset)
     db.session.commit()
@@ -107,3 +130,4 @@ class TestDataset(BaseTestCase):
                 content_type='application/json'
             )
             self.assertResponse(response, status_code=201, status='success', message='added')
+'''

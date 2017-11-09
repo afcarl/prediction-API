@@ -4,7 +4,7 @@ services:
 
   nginx:
     container_name: nginx
-    build: ./nginx/
+    build: ./services/nginx/
     restart: always
     ports:
       - 80:80
@@ -27,6 +27,15 @@ services:
     healthcheck:
       test: exit 0
 
+  model-iris:
+    container_name: model-iris
+    build:
+      context: ./services/containerize_model/
+      args:
+        - model_dir=models/iris
+    ports:
+      - 5002:5000
+
   model-server:
     container_name: model-server
     build: .
@@ -41,4 +50,5 @@ services:
         condition: service_healthy
     links:
       - postgres-db
+      - model-iris
     command: gunicorn -b 0.0.0.0:5000 manage:app

@@ -10,19 +10,17 @@ class CustomModel:
 
 
 class Model(db.Model, CustomModel):
-    __tablename__ = 'models'
+    __tablename__ = 'model'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    modelname = db.Column(db.String(128), nullable=False)
-    task = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
+    model_name = db.Column(db.String(128), nullable=False)
+    api_endpoint = db.Column(db.String(32), nullable=False)
 
-    def __init__(self, modelname, task):
-        self.super()
-        self.modelname = modelname
-        self.task = task
+    def __init__(self, model_name, api_endpoint):
+        self.model_name = model_name
+        self.api_endpoint = api_endpoint
 
 
-class Dataset(db.Model, CustomModel):
+'''class Dataset(db.Model, CustomModel):
     __tablename__ = 'dataset'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     dataset_name = db.Column(db.String(128), nullable=False)
@@ -55,3 +53,4 @@ class Data(db.Model, CustomModel):
     def __init__(self, features, target):
         self.features = features
         self.target = target
+'''
