@@ -5,4 +5,3 @@ psycopg2==2.7.3
 flask-testing==0.6.2
 gunicorn==19.7.1
 requests==2.18.4
-pandas==0.20.3

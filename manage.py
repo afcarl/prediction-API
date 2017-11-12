@@ -2,7 +2,8 @@ from flask_script import Manager
 import unittest
 
 from services import create_app, db
-from services.model_server.models import Model
+from services.model_server.models import Model, Dataset
+from services.model_server.data.data_handling import create_table, parse_csv
 
 import sys, logging
 
@@ -15,6 +16,7 @@ manager = Manager(app)
 @manager.command
 def recreate_db():
     """Recreate the database"""
+    db.reflect()
     db.drop_all()
     db.create_all()
     db.session.commit()
@@ -43,7 +45,16 @@ def seed_db():
                            'Regression'))'''
     model = Model(model_name='iris', api_endpoint='iris')
     db.session.add(model)
+    dataset = Dataset(dataset_name='iris', database_name='iris', url='..', task_type='Classification', target_column='Name')
+    db.session.add(dataset)
+    #create_table('IRIS', ('width', 'height'), ('int', 'varchar(255)'))
     db.session.commit()
+
+
+@manager.command
+def add_iris():
+    parse_csv('iris', '/usr/src/app/services/model_server/raw_data/iris.csv')
+
 
 # If main script, start the manager
 if __name__ == '__main__':

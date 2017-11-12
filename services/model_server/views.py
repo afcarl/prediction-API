@@ -39,14 +39,16 @@ def add_model():
 @data_blueprint.route('/predict/<model_name>', methods=['POST'])
 def predict(model_name):
     available_models = Model.query.all()
-    model_api_endpoints = [model.api_endpoint for model in available_models]
+    # model_api_endpoints = [model.api_endpoint for model in available_models]
     post_data, status_code = verify_api_request(request)
     if status_code != 201:
         return post_data, status_code
     #if model_name in model_api_endpoints:
 
-    headers = {'Content-Type': 'application/json'}
-    result = requests.post('http://192.168.99.100:5002/predict'.format(model_name), data=json.dumps(post_data),
+    headers = {'Content-Type': 'application/json'} #
+    # result = requests.post('http://192.168.99.100:5002/predict'.format(model_name), data=json.dumps(post_data),
+    #                        headers=headers)
+    result = requests.post('http://model-iris:5000/predict'.format(model_name), data=json.dumps(post_data),
                            headers=headers)
 
     result = result.json()

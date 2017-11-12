@@ -24,6 +24,8 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    # networks:
+    #  - prediction-network
     healthcheck:
       test: exit 0
 
@@ -35,6 +37,8 @@ services:
         - model_dir=models/iris
     ports:
       - 5002:5000
+    # networks:
+    #   - prediction-network
 
   model-server:
     container_name: model-server
@@ -48,7 +52,6 @@ services:
     depends_on:
       postgres-db:
         condition: service_healthy
-    links:
-      - postgres-db
-      - model-iris
+    # networks:
+    #   - prediction-network
     command: gunicorn -b 0.0.0.0:5000 manage:app
